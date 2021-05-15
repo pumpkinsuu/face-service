@@ -1,0 +1,29 @@
+import face_recognition as fr
+from utilities import b64ToArray
+
+NAME = 'dlib'
+INPUT = (150, 150)
+OUTPUT = 128
+TOL = 0.37
+FACE_LOCATION = [(0, 150, 150, 0)]
+
+
+def preprocess(b64str: str):
+    return b64ToArray(b64str, INPUT).tolist()
+
+
+class Model:
+    def __init__(self):
+        self.model = fr
+        self.name = NAME
+        self.input = INPUT
+        self.output = OUTPUT
+        self.tol = TOL
+        self.face_location = FACE_LOCATION
+
+    def embedding(self, data: list):
+        embeds = [
+            self.model.face_encodings(img, self.face_location)[0].tolist()
+            for img in data
+        ]
+        return embeds

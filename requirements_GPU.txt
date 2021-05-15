@@ -1,0 +1,8 @@
+numpy
+flask
+redis
+pymongo
+pymongo[srv]
+pillow
+face_recognition
+tensorflow
