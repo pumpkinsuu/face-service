@@ -1,7 +1,7 @@
 from flask import request, Blueprint
 from uuid import uuid4
 import json
-from time import sleep
+from time import sleep, time
 from redis import StrictRedis
 
 import config
@@ -156,7 +156,9 @@ def create_face_bp(app):
             raise ErrorAPI(500, 'database empty')
 
         db_ids, db_embeds = face_db.get_users(collection)
+        t = time()
         embeds = get_embed(images)
+        print(time()-t)
         ids = []
 
         for embed in embeds:
