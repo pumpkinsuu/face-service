@@ -25,6 +25,7 @@ EMBED_SLEEP = 0.1
 UPDATE_INPUT = 'users'
 UPDATE_SLEEP = 0.1
 # Mongo
+MONGO_DB = 'face_db'
 MONGO_URI = f"mongodb+srv://admin:AdminPass123" \
-            f"@cluster0.qe6sa.mongodb.net/face_db" \
+            f"@cluster0.qe6sa.mongodb.net/{MONGO_DB}" \
             f"?retryWrites=true&w=majority"

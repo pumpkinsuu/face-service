@@ -15,7 +15,7 @@ class Database:
         if app:
             self.db = PyMongo(app, uri=config.MONGO_URI).db
         else:
-            self.db = MongoClient(config.MONGO_URI).db
+            self.db = MongoClient(config.MONGO_URI)[config.MONGO_DB]
 
         self.model_name = model_name
         self.model_output = model_output
@@ -28,11 +28,12 @@ class Database:
 
     def get_users(self,
                   collection: str):
-        results = self.db[self.model_name + collection].find()
-        size = results.count()
+        size = self.db[self.model_name + collection].count_documents({})
 
         if size == 0:
-            return np.array([]), np.array([])
+            return [], np.array([])
+
+        results = self.db[self.model_name + collection].find()
 
         ids = [None] * size
         embeds = np.empty((size, self.model_output))

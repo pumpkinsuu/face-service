@@ -83,9 +83,9 @@ def create_face_bp(app):
     @face_bp.route('/<collection>/users', methods=['GET'])
     def get_users(collection: str):
         ids, _ = face_db.get_users(collection)
-        return response(200, ids.tolist())
+        return response(200, ids)
 
-    @face_bp.route('/<collection>/users/<user_id>', methods=['POST, PUT'])
+    @face_bp.route('/<collection>/users/<user_id>', methods=['POST', 'PUT'])
     def update_user(collection: str, user_id: str):
         if 'front' not in request.form:
             raise ErrorAPI(400, 'missing "front"')
@@ -145,12 +145,15 @@ def create_face_bp(app):
 
     @face_bp.route('/<collection>/verify', methods=['POST'])
     def verify(collection: str):
-        if face_db.count(collection) < 1:
-            raise ErrorAPI(500, 'database empty')
+        if 'images' not in request.form:
+            raise ErrorAPI(400, 'missing "images"')
 
         images = request.form.getlist('images')
-        if images:
-            raise ErrorAPI(400, 'missing "images"')
+        if not isinstance(images, list):
+            raise ErrorAPI(400, '"images" not list')
+
+        if face_db.count(collection) < 1:
+            raise ErrorAPI(500, 'database empty')
 
         db_ids, db_embeds = face_db.get_users(collection)
         embeds = get_embed(images)
