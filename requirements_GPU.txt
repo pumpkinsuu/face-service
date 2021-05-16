@@ -1,8 +1,9 @@
-numpy
+tensorflow
+face_recognition
 flask
+flask-cors
+flask-pymongo
 redis
 pymongo
 pymongo[srv]
 pillow
-face_recognition
-tensorflow
