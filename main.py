@@ -1,8 +1,11 @@
 from flask import Flask
 from flask_cors import CORS
+from multiprocessing import Process
 
 import config
 
+from services.embed import embed_service
+from services.update import update_service
 from router.face import create_face_bp
 from utilities import ErrorAPI
 
@@ -24,6 +27,9 @@ def main():
     face_bp = create_face_bp(app)
     CORS(face_bp)
     app.register_blueprint(face_bp)
+
+    Process(target=embed_service).start()
+    Process(target=update_service).start()
 
     app.run(host=config.HOST, port=config.PORT)
 

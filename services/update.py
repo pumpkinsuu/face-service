@@ -9,7 +9,7 @@ from database.mongo import Database
 from utilities import logger, find_min
 
 
-def main():
+def update_service():
     if config.MODEL == 'facenet':
         from model.facenet import NAME, OUTPUT, TOL
     else:
@@ -22,7 +22,7 @@ def main():
         db=config.REDIS_UPDATE_DB
     )
     db.flushall()
-    log = logger('sv_update.py')
+    log = logger('update.py')
 
     while True:
         try:
@@ -63,7 +63,3 @@ def main():
 
         except Exception as ex:
             log.info(ex, exc_info=True)
-
-
-if __name__ == '__main__':
-    main()

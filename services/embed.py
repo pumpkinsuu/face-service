@@ -8,7 +8,7 @@ import config
 from utilities import logger
 
 
-def main():
+def embed_service():
     if config.MODEL == 'facenet':
         from model.facenet import Model
         model = Model()
@@ -22,7 +22,7 @@ def main():
         db=config.REDIS_EMBED_DB
     )
     db.flushall()
-    log = logger('sv_embed.py')
+    log = logger('embed.py')
 
     while True:
         try:
@@ -48,7 +48,3 @@ def main():
         except Exception as ex:
             print(ex)
             log.info(ex, exc_info=True)
-
-
-if __name__ == '__main__':
-    main()
