@@ -3,13 +3,13 @@ from time import sleep
 import json
 import numpy as np
 
-import config
+from config import *
 
 from utilities import logger
 
 
 def embed_service():
-    if config.MODEL == 'facenet':
+    if MODEL == 'facenet':
         from model.facenet import Model
         model = Model()
     else:
@@ -17,16 +17,16 @@ def embed_service():
         model = Model()
 
     db = StrictRedis(
-        host=config.REDIS_HOST,
-        port=config.REDIS_PORT,
-        db=config.REDIS_EMBED_DB
+        host=REDIS_HOST,
+        port=REDIS_PORT,
+        db=REDIS_EMBED_DB
     )
     db.flushall()
     log = logger('embed.py')
 
     while True:
         try:
-            queue = db.lrange(config.EMBED_INPUT, 0, config.EMBED_SIZE - 1)
+            queue = db.lrange(EMBED_INPUT, 0, EMBED_SIZE - 1)
             ids = []
             inputs = []
 
@@ -41,9 +41,9 @@ def embed_service():
                 for idx, embed in zip(ids, embeds):
                     db.set(idx, json.dumps(embed))
 
-                db.ltrim(config.EMBED_INPUT, len(ids), - 1)
+                db.ltrim(EMBED_INPUT, len(ids), - 1)
             else:
-                sleep(config.EMBED_SLEEP)
+                sleep(EMBED_SLEEP)
 
         except Exception as ex:
             print(ex)

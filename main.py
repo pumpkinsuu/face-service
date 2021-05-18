@@ -1,13 +1,10 @@
 from flask import Flask
 from flask_cors import CORS
-from multiprocessing import Process
 
-import config
+from config import *
 
-from services.embed import embed_service
-from services.update import update_service
-from router.face import create_face_bp
-from utilities import ErrorAPI
+from routes.face import create_face_bp
+from utilities import ErrorAPI, response
 
 app = Flask(__name__)
 CORS(app)
@@ -20,19 +17,13 @@ def error_api(e: ErrorAPI):
 
 @app.route('/', methods=['GET'])
 def root():
-    return 'ok', 200
+    return response(200, 'ok')
 
 
-def main():
-    face_bp = create_face_bp(app)
-    CORS(face_bp)
-    app.register_blueprint(face_bp)
-
-    Process(target=embed_service).start()
-    Process(target=update_service).start()
-
-    app.run(host=config.HOST, port=config.PORT)
+face_bp = create_face_bp(app)
+CORS(face_bp)
+app.register_blueprint(face_bp)
 
 
 if __name__ == '__main__':
-    main()
+    app.run(host=HOST, port=PORT)

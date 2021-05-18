@@ -2,7 +2,7 @@ from pymongo import MongoClient, TEXT
 from flask_pymongo import PyMongo
 import numpy as np
 
-import config
+from config import *
 
 from utilities import logger
 
@@ -13,9 +13,9 @@ class Database:
                  model_output: int,
                  app=None):
         if app:
-            self.db = PyMongo(app, uri=config.MONGO_URI).db
+            self.db = PyMongo(app, uri=MONGO_URI).db
         else:
-            self.db = MongoClient(config.MONGO_URI)[config.MONGO_DB]
+            self.db = MongoClient(MONGO_URI)[MONGO_DB]
 
         self.model_name = model_name
         self.model_output = model_output

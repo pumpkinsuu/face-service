@@ -3,17 +3,23 @@ from uuid import uuid4
 import json
 from time import sleep, time
 from redis import StrictRedis
+from multiprocessing import Process
 
-import config
+from config import *
 
 from database.mongo import Database
 from utilities import *
+from services.embed import embed_service
+from services.update import update_service
 
 
 def create_face_bp(app):
+    Process(target=embed_service).start()
+    Process(target=update_service).start()
+
     face_bp = Blueprint('face_bp', __name__)
 
-    if config.MODEL == 'dlib':
+    if MODEL == 'dlib':
         from model.dlib import preprocess, NAME, OUTPUT, TOL
     else:
         from model.facenet import preprocess, NAME, OUTPUT, TOL
@@ -21,14 +27,14 @@ def create_face_bp(app):
     face_db = Database(NAME, OUTPUT, app)
 
     embed_db = StrictRedis(
-        host=config.REDIS_HOST,
-        port=config.REDIS_PORT,
-        db=config.REDIS_EMBED_DB
+        host=REDIS_HOST,
+        port=REDIS_PORT,
+        db=REDIS_EMBED_DB
     )
     update_db = StrictRedis(
-        host=config.REDIS_HOST,
-        port=config.REDIS_PORT,
-        db=config.REDIS_UPDATE_DB
+        host=REDIS_HOST,
+        port=REDIS_PORT,
+        db=REDIS_UPDATE_DB
     )
 
     def get_embed(images):
@@ -41,7 +47,7 @@ def create_face_bp(app):
                 'id': i,
                 'image': preprocess(img)
             }
-            embed_db.rpush(config.EMBED_INPUT, json.dumps(req))
+            embed_db.rpush(EMBED_INPUT, json.dumps(req))
 
         while True:
             if embed_db.get(i):
@@ -52,7 +58,7 @@ def create_face_bp(app):
 
                 return list(data.values())
 
-            sleep(config.REQUEST_SLEEP)
+            sleep(REQUEST_SLEEP)
 
     def update(collection, user, new):
         req = {
@@ -61,7 +67,7 @@ def create_face_bp(app):
             'user': user,
             'new': new
         }
-        update_db.rpush(config.UPDATE_INPUT, json.dumps(req))
+        update_db.rpush(UPDATE_INPUT, json.dumps(req))
 
         while True:
             res = update_db.get(req['id'])
@@ -70,11 +76,11 @@ def create_face_bp(app):
                 update_db.delete(req['id'])
                 return int(res)
 
-            sleep(config.REQUEST_SLEEP)
+            sleep(REQUEST_SLEEP)
 
-    @face_bp.route('/<collection>/users/<user_id>', methods=['GET'])
-    def get_user(collection: str, user_id: str):
-        user = face_db.get_user(collection, user_id)
+    @face_bp.route('/<collection>/users/<userID>', methods=['GET'])
+    def get_user(collection: str, userID: str):
+        user = face_db.get_user(collection, userID)
         if not user:
             raise ErrorAPI(404, 'user not found')
 
@@ -85,8 +91,8 @@ def create_face_bp(app):
         ids, _ = face_db.get_users(collection)
         return response(200, ids)
 
-    @face_bp.route('/<collection>/users/<user_id>', methods=['POST', 'PUT'])
-    def update_user(collection: str, user_id: str):
+    @face_bp.route('/<collection>/users/<userID>', methods=['POST', 'PUT'])
+    def update_user(collection: str, userID: str):
         if 'front' not in request.form:
             raise ErrorAPI(400, 'missing "front"')
         if 'left' not in request.form:
@@ -104,12 +110,12 @@ def create_face_bp(app):
             raise ErrorAPI(400, 'different person')
 
         user = {
-            'id': user_id,
+            'id': userID,
             'embed': mean([f, l, r])
         }
 
         if request.method == 'POST':
-            if face_db.get_user(collection, user_id):
+            if face_db.get_user(collection, userID):
                 raise ErrorAPI(409, 'user already exists')
             status = update(
                 collection=collection,
@@ -117,7 +123,7 @@ def create_face_bp(app):
                 new=True
             )
         else:
-            if not face_db.get_user(collection, user_id):
+            if not face_db.get_user(collection, userID):
                 raise ErrorAPI(404, 'user not registered')
             status = update(
                 collection=collection,
@@ -133,18 +139,18 @@ def create_face_bp(app):
 
         return response(status, 'success')
 
-    @face_bp.route('/<collection>/users/<user_id>', methods=['DELETE'])
-    def remove_user(collection: str, user_id: str):
-        if not face_db.get_user(collection, user_id):
+    @face_bp.route('/<collection>/users/<userID>', methods=['DELETE'])
+    def remove_user(collection: str, userID: str):
+        if not face_db.get_user(collection, userID):
             raise ErrorAPI(404, 'user not registered')
 
-        if not face_db.remove(collection, user_id):
+        if not face_db.remove(collection, userID):
             raise ErrorAPI(500, 'failed')
 
-        return {'result': 'success'}
+        return response(200, 'success')
 
-    @face_bp.route('/<collection>/verify', methods=['POST'])
-    def verify(collection: str):
+    @face_bp.route('/<collection>/find', methods=['POST'])
+    def find(collection: str):
         if 'images' not in request.form:
             raise ErrorAPI(400, 'missing "images"')
 
@@ -177,9 +183,9 @@ def create_face_bp(app):
 
     @face_bp.route('/{collection}', methods=['PUT'])
     def rename_collection(collection: str):
-        if 'name' not in request.args:
+        if 'name' not in request.json:
             raise ErrorAPI(400, 'missing "name"')
-        if not face_db.rename(collection, request.args['name']):
+        if not face_db.rename(collection, request.json['name']):
             raise ErrorAPI(500, 'failed')
 
         return response(200, 'success')

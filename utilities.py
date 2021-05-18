@@ -41,19 +41,23 @@ def logger(name):
     return log
 
 
-def response(status, message, data=''):
-    return jsonify({
-        'status': status,
-        'message': message,
-        'data': data
-    }), status
+def response(code, data):
+    return jsonify(data), code
 
 
 class ErrorAPI(Exception):
-    def __init__(self, status, message):
+    def __init__(self, code, message):
         super().__init__()
-        self.status = status
+        self.code = code
         self.message = message
 
     def detail(self):
-        return response(self.status, self.message)
+        return response(
+            self.code,
+            {
+                'error': {
+                    'code': self.code,
+                    'message': self.message
+                }
+            }
+        )

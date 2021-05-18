@@ -7,10 +7,6 @@ MODEL = 'dlib'
 # Server
 HOST = 'localhost'
 PORT = 5001
-ORIGINS = [
-    f'http://{HOST}',
-    f'http://{HOST}:{PORT}',
-]
 # Redis
 REDIS_HOST = '127.0.0.1'
 REDIS_PORT = 6379
