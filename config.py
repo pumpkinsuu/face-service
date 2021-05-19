@@ -5,7 +5,7 @@
 """
 MODEL = 'dlib'
 # Server
-HOST = 'localhost'
+HOST = '0.0.0.0'
 PORT = 5001
 # Redis
 REDIS_HOST = '127.0.0.1'
