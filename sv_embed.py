@@ -22,7 +22,7 @@ def embed_service():
         db=REDIS_EMBED_DB
     )
     db.flushall()
-    log = logger('embed.py')
+    log = logger('sv_embed.py')
 
     while True:
         try:
@@ -48,3 +48,7 @@ def embed_service():
         except Exception as ex:
             print(ex)
             log.info(ex, exc_info=True)
+
+
+if __name__ == "__main__":
+    embed_service()

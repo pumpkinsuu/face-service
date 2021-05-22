@@ -22,7 +22,7 @@ def update_service():
         db=REDIS_UPDATE_DB
     )
     db.flushall()
-    log = logger('update.py')
+    log = logger('sv_update.py')
 
     while True:
         try:
@@ -63,3 +63,7 @@ def update_service():
 
         except Exception as ex:
             log.info(ex, exc_info=True)
+
+
+if __name__ == "__main__":
+    update_service()

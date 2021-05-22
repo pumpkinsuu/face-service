@@ -1,22 +1,16 @@
 from flask import request, Blueprint
 from uuid import uuid4
 import json
-from time import sleep, time
+from time import sleep
 from redis import StrictRedis
-from multiprocessing import Process
 
 from config import *
 
 from database.mongo import Database
 from utilities import *
-from services.embed import embed_service
-from services.update import update_service
 
 
 def create_face_bp(app):
-    Process(target=embed_service).start()
-    Process(target=update_service).start()
-
     face_bp = Blueprint('face_bp', __name__)
 
     if MODEL == 'dlib':
@@ -162,9 +156,7 @@ def create_face_bp(app):
             raise ErrorAPI(500, 'database empty')
 
         db_ids, db_embeds = face_db.get_users(collection)
-        t = time()
         embeds = get_embed(images)
-        print(time()-t)
         ids = []
 
         for embed in embeds:

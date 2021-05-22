@@ -72,7 +72,6 @@ class Database:
                     }
                 }
             )
-
             return True
         except Exception as ex:
             self.log.info(ex, exc_info=True)
