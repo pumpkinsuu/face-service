@@ -35,6 +35,9 @@ def create_face_bp(app):
         data = {}
         i = ''
         for img in images:
+            if not img:
+                raise ErrorAPI(400, 'image empty')
+
             i = str(uuid4())
             data[i] = []
             req = {
@@ -94,18 +97,18 @@ def create_face_bp(app):
         if 'right' not in request.form:
             raise ErrorAPI(400, 'missing "right"')
 
-        f, l, r = get_embed([
-            request.form['front'],
-            request.form['left'],
-            request.form['right']
-        ])
+        front = request.form['front']
+        left = request.form['left']
+        right = request.form['right']
 
-        if distance(f, l) > TOL or distance(f, r) > TOL:
+        front, left, right = get_embed([front, left, right])
+
+        if distance(front, left) > TOL or distance(front, right) > TOL:
             raise ErrorAPI(400, 'different person')
 
         user = {
             'id': userID,
-            'embed': mean([f, l, r])
+            'embed': mean([front, left, right])
         }
 
         if request.method == 'POST':
