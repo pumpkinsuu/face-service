@@ -36,7 +36,7 @@ def update_service():
 
                 idx = -1
                 dist = 0
-                if len(ids):
+                if ids:
                     idx, dist = find_min(np.array(user['embed']), embeds)
 
                 code = 409

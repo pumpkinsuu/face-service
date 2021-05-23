@@ -1,0 +1,13 @@
+[Unit]
+Description=Face service
+After=multi-user.target
+
+[Service]
+Type=simple
+Restart=always
+WorkingDirectory=/home/<username>/face-service
+Environment="PATH=/home/<username>/env/bin"
+ExecStart=/home/<username>/env/bin/gunicorn --workers 2 --bind 0.0.0.0:5001 wsgi:app
+
+[Install]
+WantedBy=multi-user.target

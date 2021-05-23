@@ -39,6 +39,7 @@ def embed_service():
                 embeds = model.embedding(inputs)
 
                 for idx, embed in zip(ids, embeds):
+                    print(len(embed))
                     db.set(idx, json.dumps(embed))
 
                 db.ltrim(EMBED_INPUT, len(ids), - 1)
