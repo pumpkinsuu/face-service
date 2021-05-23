@@ -39,7 +39,6 @@ def embed_service():
                 embeds = model.embedding(inputs)
 
                 for idx, embed in zip(ids, embeds):
-                    print(len(embed))
                     db.set(idx, json.dumps(embed))
 
                 db.ltrim(EMBED_INPUT, len(ids), - 1)
@@ -47,7 +46,6 @@ def embed_service():
                 sleep(EMBED_SLEEP)
 
         except Exception as ex:
-            print(ex)
             log.info(ex, exc_info=True)
 
 
