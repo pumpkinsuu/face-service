@@ -20,7 +20,7 @@ EMBED_SIZE = 30
 EMBED_SLEEP = 0.1
 # Register
 UPDATE_INPUT = 'users'
-UPDATE_SLEEP = 0.1
+UPDATE_SLEEP = 0.2
 # Mongo
 MONGO_DB = 'face_db'
 MONGO_URI = f"mongodb+srv://admin:AdminPass123" \
