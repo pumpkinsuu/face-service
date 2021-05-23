@@ -7,6 +7,7 @@ MODEL = 'facenet'
 # Server
 HOST = '0.0.0.0'
 PORT = 5001
+TIMEOUT = 5
 # Redis
 REDIS_HOST = '127.0.0.1'
 REDIS_PORT = 6379

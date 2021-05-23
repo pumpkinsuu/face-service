@@ -47,7 +47,8 @@ def create_face_bp(app):
             }
             embed_db.rpush(EMBED_INPUT, json.dumps(req))
 
-        while True:
+        t = 0
+        while t < TIMEOUT:
             try:
                 if embed_db.get(i):
                     for x in data:
@@ -58,6 +59,7 @@ def create_face_bp(app):
                     return list(data.values())
 
                 sleep(REQUEST_SLEEP)
+                t += REQUEST_SLEEP
             except Exception as ex:
                 for x in data:
                     embed_db.delete(x)
@@ -74,7 +76,8 @@ def create_face_bp(app):
         }
         update_db.rpush(UPDATE_INPUT, json.dumps(req))
 
-        while True:
+        t = 0
+        while t < TIMEOUT:
             res = update_db.get(req['id'])
 
             if res:
@@ -82,6 +85,7 @@ def create_face_bp(app):
                 return int(res)
 
             sleep(REQUEST_SLEEP)
+            t += REQUEST_SLEEP
 
     @face_bp.route('/<collection>/users/<userID>', methods=['GET'])
     def get_user(collection: str, userID: str):
