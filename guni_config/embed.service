@@ -1,0 +1,15 @@
+[Unit]
+Description=Embedding instance to serve face service
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+User=pumpk
+Group=www-data
+WorkingDirectory=/home/pumpk/face-service
+Environment="PATH=/home/pumpk/env/bin"
+ExecStart=/home/pumpk/env/bin/python3 /home/pumpk/face-service/sv_embed.py
+
+[Install]
+WantedBy=multi-user.target

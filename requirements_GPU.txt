@@ -6,4 +6,3 @@ flask-pymongo
 redis
 pymongo
 pymongo[srv]
-pillow
