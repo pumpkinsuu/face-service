@@ -2,7 +2,7 @@ tensorflow
 face_recognition
 flask
 flask-cors
-flask-pymongo
-redis
 pymongo
+flask-pymongo
 pymongo[srv]
+redis
