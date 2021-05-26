@@ -16,7 +16,7 @@ REDIS_UPDATE_DB = 1
 REQUEST_SLEEP = 0.1
 # Model
 EMBED_INPUT = 'images'
-EMBED_SIZE = 30
+EMBED_SIZE = 3
 EMBED_SLEEP = 0.1
 # Register
 UPDATE_INPUT = 'users'
