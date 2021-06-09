@@ -41,7 +41,7 @@ def create_admin_bp(app):
                 return redirect(url_for('admin_bp.main'))
             flash('Invalid username or password', 'warn')
 
-        return render_template('loginPage.html')
+        return render_template('templates/loginPage.html')
 
     @admin_bp.route('/logout')
     def logout():
@@ -52,7 +52,7 @@ def create_admin_bp(app):
     @login_required
     def main():
         data = db.get()
-        return render_template('mainPage.html', data=data)
+        return render_template('templates/mainPage.html', data=data)
 
     @admin_bp.route('/collection', methods=['GET', 'POST'])
     @login_required
@@ -66,7 +66,7 @@ def create_admin_bp(app):
                 return redirect(url_for('admin_bp.update', collection=collection))
             else:
                 flash('Failed to create', 'error')
-        return render_template('addPage.html')
+        return render_template('templates/addPage.html')
 
     @admin_bp.route('/collection/<collection>', methods=['GET', 'POST'])
     @login_required
@@ -80,7 +80,7 @@ def create_admin_bp(app):
         data = db.get_data({'collection': collection})
         if not data:
             abort(404)
-        return render_template('editPage.html', data=data)
+        return render_template('templates/editPage.html', data=data)
 
     @admin_bp.route('/collection/<collection>/remove', methods=['POST'])
     @login_required
