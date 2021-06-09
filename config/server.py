@@ -3,7 +3,7 @@
     facenet
     dlib
 """
-MODEL = 'facenet'
+MODEL = 'dlib'
 # Server
 HOST = '0.0.0.0'
 PORT = 5001
@@ -22,7 +22,10 @@ EMBED_SLEEP = 0.1
 UPDATE_INPUT = 'users'
 UPDATE_SLEEP = 0.2
 # Mongo
-MONGO_DB = 'face_db'
 MONGO_URI = f"mongodb+srv://admin:AdminPass123" \
-            f"@cluster0.qe6sa.mongodb.net/{MONGO_DB}" \
+            f"@cluster0.qe6sa.mongodb.net/"
+FACE_DB = 'face_db'
+FACE_URI = f"mongodb+srv://admin:AdminPass123" \
+            f"@cluster0.qe6sa.mongodb.net/{FACE_DB}" \
             f"?retryWrites=true&w=majority"
+USER_DB = 'user_db'

@@ -4,5 +4,6 @@ flask
 flask-cors
 pymongo
 flask-pymongo
+flask-login
 pymongo[srv]
 redis

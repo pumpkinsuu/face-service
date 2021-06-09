@@ -2,24 +2,24 @@ from pymongo import MongoClient, TEXT
 from flask_pymongo import PyMongo
 import numpy as np
 
-from config import *
+from config.server import FACE_URI, FACE_DB
 
 from utilities import logger
 
 
-class Database:
+class FaceData:
     def __init__(self,
                  model_name: str,
                  model_output: int,
                  app=None):
         if app:
-            self.db = PyMongo(app, uri=MONGO_URI).db
+            self.db = PyMongo(app, uri=FACE_URI).db
         else:
-            self.db = MongoClient(MONGO_URI)[MONGO_DB]
+            self.db = MongoClient(FACE_URI)[FACE_DB]
 
         self.model_name = model_name
         self.model_output = model_output
-        self.log = logger('mongo.py')
+        self.log = logger('faceDB')
 
     def get_user(self,
                  collection: str,

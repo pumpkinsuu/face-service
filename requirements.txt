@@ -3,6 +3,7 @@ face_recognition
 flask
 flask-cors
 flask-pymongo
+flask-login
 redis
 pymongo
 pymongo[srv]

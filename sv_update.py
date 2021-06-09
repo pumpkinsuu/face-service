@@ -3,9 +3,9 @@ from time import sleep
 import json
 import numpy as np
 
-from config import *
+from config.server import *
 
-from database.mongo import Database
+from database.face import FaceData
 from utilities import logger, find_min
 
 
@@ -15,7 +15,7 @@ def update_service():
     else:
         from model.dlib import NAME, OUTPUT, TOL
 
-    face_db = Database(NAME, OUTPUT)
+    face_db = FaceData(NAME, OUTPUT)
     db = StrictRedis(
         host=REDIS_HOST,
         port=REDIS_PORT,

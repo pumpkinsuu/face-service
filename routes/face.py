@@ -1,12 +1,12 @@
-from flask import request, Blueprint
+from flask import request, Blueprint, g
 from uuid import uuid4
 import json
 from time import sleep
 from redis import StrictRedis
 
-from config import *
+from config.server import *
 
-from database.mongo import Database
+from database.face import FaceData
 from utilities import *
 log = logger('face.py')
 
@@ -19,7 +19,7 @@ def create_face_bp(app):
     else:
         from model.facenet import preprocess, NAME, OUTPUT, TOL
 
-    face_db = Database(NAME, OUTPUT, app)
+    face_db = FaceData(NAME, OUTPUT, app)
 
     embed_db = StrictRedis(
         host=REDIS_HOST,
@@ -87,76 +87,76 @@ def create_face_bp(app):
             sleep(REQUEST_SLEEP)
             t += REQUEST_SLEEP
 
-    @face_bp.route('/<collection>/users/<userID>', methods=['GET'])
-    def get_user(collection: str, userID: str):
-        user = face_db.get_user(collection, userID)
+    @face_bp.route('/users/<userID>', methods=['GET'])
+    def get_user(userID: str):
+        user = face_db.get_user(
+            g['collection'],
+            userID
+        )
         if not user:
             raise ErrorAPI(404, 'user not found')
 
         return response(200, 'exist')
 
-    @face_bp.route('/<collection>/users', methods=['GET'])
-    def get_users(collection: str):
-        ids, _ = face_db.get_users(collection)
+    @face_bp.route('/users', methods=['GET'])
+    def get_users():
+        ids, _ = face_db.get_users(g['collection'])
         return response(200, ids)
 
-    @face_bp.route('/<collection>/users/<userID>', methods=['POST', 'PUT'])
-    def update_user(collection: str, userID: str):
-        try:
-            if 'front' not in request.form:
-                raise ErrorAPI(400, 'missing "front"')
-            if 'left' not in request.form:
-                raise ErrorAPI(400, 'missing "left"')
-            if 'right' not in request.form:
-                raise ErrorAPI(400, 'missing "right"')
+    @face_bp.route('/users/<userID>', methods=['POST', 'PUT'])
+    def update_user(userID: str):
+        if 'front' not in request.form:
+            raise ErrorAPI(400, 'missing "front"')
+        if 'left' not in request.form:
+            raise ErrorAPI(400, 'missing "left"')
+        if 'right' not in request.form:
+            raise ErrorAPI(400, 'missing "right"')
 
-            front = request.form['front']
-            left = request.form['left']
-            right = request.form['right']
+        collection = g['collection']
 
-            front, left, right = get_embed([front, left, right])
+        front = request.form['front']
+        left = request.form['left']
+        right = request.form['right']
 
-            if distance(front, left) > TOL or distance(front, right) > TOL:
-                raise ErrorAPI(400, 'different person')
+        front, left, right = get_embed([front, left, right])
 
-            user = {
-                'id': userID,
-                'embed': mean([front, left, right])
-            }
+        if distance(front, left) > TOL or distance(front, right) > TOL:
+            raise ErrorAPI(400, 'different person')
 
-            if request.method == 'POST':
-                if face_db.get_user(collection, userID):
-                    raise ErrorAPI(409, 'user already exists')
-                status = update(
-                    collection=collection,
-                    user=user,
-                    new=True
-                )
-            else:
-                if not face_db.get_user(collection, userID):
-                    raise ErrorAPI(404, 'user not registered')
-                status = update(
-                    collection=collection,
-                    user=user,
-                    new=False
-                )
+        user = {
+            'id': userID,
+            'embed': mean([front, left, right])
+        }
 
-            if status == 409:
-                raise ErrorAPI(409, 'face already exists')
+        if request.method == 'POST':
+            if face_db.get_user(collection, userID):
+                raise ErrorAPI(409, 'user already exists')
+            status = update(
+                collection=collection,
+                user=user,
+                new=True
+            )
+        else:
+            if not face_db.get_user(collection, userID):
+                raise ErrorAPI(404, 'user not registered')
+            status = update(
+                collection=collection,
+                user=user,
+                new=False
+            )
 
-            if status == 500:
-                raise ErrorAPI(500, 'failed')
+        if status == 409:
+            raise ErrorAPI(409, 'face already exists')
 
-            return response(status, 'success')
+        if status == 500:
+            raise ErrorAPI(500, 'failed')
 
-        except ErrorAPI as err:
-            raise err
-        except Exception as ex:
-            log.info(str(ex), exc_info=True)
-            raise ErrorAPI(500, str(ex))
+        return response(status, 'success')
 
-    @face_bp.route('/<collection>/users/<userID>', methods=['DELETE'])
-    def remove_user(collection: str, userID: str):
+    @face_bp.route('/users/<userID>', methods=['DELETE'])
+    def remove_user(userID: str):
+        collection = g['collection']
+
         if not face_db.get_user(collection, userID):
             raise ErrorAPI(404, 'user not registered')
 
@@ -165,57 +165,32 @@ def create_face_bp(app):
 
         return response(200, 'success')
 
-    @face_bp.route('/<collection>/find', methods=['POST'])
-    def find(collection: str):
-        try:
-            if 'images' not in request.form:
-                raise ErrorAPI(400, 'missing "images"')
+    @face_bp.route('/find', methods=['POST'])
+    def find():
+        collection = g['collection']
 
-            images = request.form.getlist('images')
-            if not isinstance(images, list):
-                raise ErrorAPI(400, '"images" not list')
+        if 'images' not in request.form:
+            raise ErrorAPI(400, 'missing "images"')
 
-            if face_db.count(collection) < 1:
-                raise ErrorAPI(500, 'database empty')
+        images = request.form.getlist('images')
+        if not isinstance(images, list):
+            raise ErrorAPI(400, '"images" not list')
 
-            db_ids, db_embeds = face_db.get_users(collection)
-            embeds = get_embed(images)
-            ids = []
+        db_ids, db_embeds = face_db.get_users(collection)
+        if not db_ids:
+            raise ErrorAPI(500, 'no face registered')
 
-            for embed in embeds:
-                idx, dist = find_min(embed, db_embeds)
+        embeds = get_embed(images)
+        ids = []
 
-                if dist < TOL:
-                    ids.append(db_ids[idx])
-                else:
-                    ids.append('')
+        for embed in embeds:
+            idx, dist = find_min(embed, db_embeds)
 
-            return response(200, ids)
+            if dist < TOL:
+                ids.append(db_ids[idx])
+            else:
+                ids.append('')
 
-        except ErrorAPI as err:
-            raise err
-        except Exception as ex:
-            log.info(str(ex), exc_info=True)
-            raise ErrorAPI(500, str(ex))
-
-    @face_bp.route('/{collection}', methods=['GET'])
-    def count_collection(collection: str):
-        return response(200, face_db.count(collection))
-
-    @face_bp.route('/{collection}', methods=['PUT'])
-    def rename_collection(collection: str):
-        if 'name' not in request.json:
-            raise ErrorAPI(400, 'missing "name"')
-        if not face_db.rename(collection, request.json['name']):
-            raise ErrorAPI(500, 'failed')
-
-        return response(200, 'success')
-
-    @face_bp.route('/<collection>', methods=['DELETE'])
-    def drop_collection(collection: str):
-        if not face_db.drop(collection):
-            raise ErrorAPI(500, 'failed')
-
-        return response(200, 'success')
+        return response(200, ids)
 
     return face_bp

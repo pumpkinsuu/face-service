@@ -3,7 +3,7 @@ from time import sleep
 import json
 import numpy as np
 
-from config import *
+from config.server import *
 
 from utilities import logger
 
