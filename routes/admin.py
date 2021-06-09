@@ -34,10 +34,6 @@ def create_admin_bp(app):
             if username == USERNAME and password == PASSWORD:
                 user = User(USERNAME)
                 login_user(user)
-
-                _next = request.args.get('next')
-                if _next:
-                    return redirect(url_for(_next))
                 return redirect(url_for('admin_bp.main'))
             flash('Invalid username or password', 'warn')
 
@@ -91,5 +87,13 @@ def create_admin_bp(app):
         else:
             flash('Failed to remove', 'error')
             return redirect(url_for('admin_bp.update', collection=collection))
+
+    @admin_bp.route('/search')
+    @login_required
+    def search():
+        keyword = request.args.get('keyword')
+        data = db.search(keyword)
+        flash(f'{len(data)} results', 'info')
+        return render_template('mainPage.html', data=data)
 
     return admin_bp

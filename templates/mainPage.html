@@ -31,6 +31,11 @@
                 font-size: 3.5rem;
             }
         }
+
+        div .input-group {
+            width: 50%;
+            margin: 0 auto;
+        }
     </style>
 
 
@@ -49,37 +54,19 @@
             <hr>
             <ul class="nav nav-pills flex-column mb-auto">
                 <li class="nav-item">
-                    <a href="#" class="nav-link active" aria-current="page">
+                    <a href="{{ url_for('admin_bp.main') }}" class="nav-link active" aria-current="page">
                         <svg class="bi me-2" width="16" height="16">
                             <use xlink:href="#home" />
                         </svg>
                         Home
                     </a>
+                    <a href="{{ url_for('admin_bp.create') }}" class="nav-link" aria-current="page">
+                        <svg class="bi me-2" width="16" height="16">
+                            <use xlink:href="#home" />
+                        </svg>
+                        Add
+                    </a>
                 </li>
-                <!-- <li>
-        <a href="#" class="nav-link text-white">
-          <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"/></svg>
-          Dashboard
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-link text-white">
-          <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"/></svg>
-          Orders
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-link text-white">
-          <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"/></svg>
-          Products
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-link text-white">
-          <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
-          Customers
-        </a>
-      </li> -->
             </ul>
             <hr>
             <div class="dropdown">
@@ -93,13 +80,34 @@
                 </ul>
             </div>
         </div>
-
     </main>
     <div class="container">
-        <div style="text-align: right; padding:1rem">
-            <button type="button" class="btn btn-primary">
-                <a href="{{ url_for('admin_bp.create') }}">Add A Collection</a>
-            </button>
+        <div style="display: flex; justify-content: space-between; margin: 1.5rem 0;">
+            <div>
+                <h3>HOME</h3>
+            </div>
+            <button type="button" class="btn btn-primary"><a href="{{ url_for('admin_bp.create') }}">Add A Collection</a></button>
+        </div>
+
+        <form class="input-group mb-2 mt-5" action="{{ url_for('admin_bp.search', keyword=keyword) }}">
+            <span class="input-group-text" id="basic-addon1"><svg xmlns="http://www.w3.org/2000/svg" width="16"
+                    height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                    <path
+                        d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+                </svg></span>
+            <input type="text" class="form-control" placeholder="Search Moodle" aria-label="url"
+                aria-describedby="basic-addon1" name="keyword" required>
+            <button class="btn btn-primary" type="submit">Search</button>
+        </form>
+        <div>
+          {% with msg = get_flashed_messages(category_filter=["info"])[-1] %}
+            {% if msg %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{msg}}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endif %}
+          {% endwith %}
         </div>
         {% if data %}
         <table class="table">
@@ -114,7 +122,7 @@
             <tbody>
                 {% for i in range(data | length) %}
                 <tr>
-                    <th scope="row">{{i+1}}</th>
+                    <th scope="row">{{i}}</th>
                     <td>{{data[i].collection}}</td>
                     <td>{{data[i].key}}</td>
                     <td>

@@ -1,4 +1,4 @@
-from pymongo import MongoClient, TEXT
+from pymongo import MongoClient, TEXT, ASCENDING, DESCENDING
 from flask_pymongo import PyMongo
 import secrets
 
@@ -23,13 +23,15 @@ class AdminData:
         return self.db.find_one(data)
 
     def get(self):
-        results = self.db.find()
-        data = []
+        results = self.db.find().sort([("collection", ASCENDING)])
+        return list(results)
 
-        for res in results:
-            data.append(res)
-
-        return data
+    def search(self, keyword):
+        results = self.db.find(
+            {"$text": {"$search": keyword}},
+            {"score": {"$meta": "textScore"}}
+        ).sort([("score", {"$meta": "textScore"})])
+        return list(results)
 
     def create(self, collection: str):
         try:
