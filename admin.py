@@ -1,6 +1,5 @@
 from flask import Flask
 from flask_cors import CORS
-import os
 
 from config.admin import *
 
@@ -8,9 +7,7 @@ from routes.admin import create_admin_bp
 from utilities import ErrorAPI, logger, response
 log = logger('face')
 
-templates = os.path.abspath('templates')
-print(templates)
-app = Flask(__name__, static_folder='static', template_folder=templates)
+app = Flask(__name__, static_folder='static')
 CORS(app)
 app.secret_key = SECRET
 
