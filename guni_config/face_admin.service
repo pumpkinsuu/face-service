@@ -9,7 +9,7 @@ User=pumpk
 Group=www-data
 WorkingDirectory=/home/pumpk/face-service
 Environment="PATH=/home/pumpk/env/bin"
-ExecStart=/home/pumpk/env/bin/gunicorn --workers 1 --bind 0.0.0.0:7001 admin:app
+ExecStart=/home/pumpk/env/bin/gunicorn --workers 1 --bind 0.0.0.0:7001 a_wsgi:app
 
 [Install]
 WantedBy=multi-user.target
