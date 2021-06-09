@@ -10,6 +10,8 @@ log = logger('face')
 app = Flask(__name__, static_folder='static')
 CORS(app)
 app.secret_key = SECRET
+app.debug = True
+app.config['EXPLAIN_TEMPLATE_LOADING'] = True
 
 
 @app.errorhandler(ErrorAPI)
