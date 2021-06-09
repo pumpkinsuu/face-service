@@ -1,4 +1,4 @@
-from pymongo import MongoClient, TEXT, ASCENDING, DESCENDING
+from pymongo import MongoClient, TEXT, ASCENDING
 from flask_pymongo import PyMongo
 import secrets
 
