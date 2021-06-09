@@ -6,7 +6,9 @@ from config.admin import *
 
 
 def create_admin_bp(app):
-    admin_bp = Blueprint('admin_bp', __name__)
+    admin_bp = Blueprint('admin_bp', __name__,
+                         template_folder='../templates',
+                         static_folder='../static')
 
     db = AdminData(app)
     login_manager = LoginManager()
