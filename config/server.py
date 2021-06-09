@@ -17,10 +17,10 @@ REQUEST_SLEEP = 0.1
 # Model
 EMBED_INPUT = 'images'
 EMBED_SIZE = 3
-EMBED_SLEEP = 0.1
+EMBED_SLEEP = 0.2
 # Register
 UPDATE_INPUT = 'users'
-UPDATE_SLEEP = 0.2
+UPDATE_SLEEP = 0.5
 # Mongo
 MONGO_URI = f"mongodb+srv://admin:AdminPass123" \
             f"@cluster0.qe6sa.mongodb.net/"
