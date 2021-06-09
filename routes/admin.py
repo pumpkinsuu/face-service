@@ -34,9 +34,12 @@ def create_admin_bp(app):
             if username == USERNAME and password == PASSWORD:
                 user = User(USERNAME)
                 login_user(user)
+
+                _next = request.args.get('next')
+                if _next:
+                    return redirect(url_for(_next))
                 return redirect(url_for('admin_bp.main'))
             flash('Invalid username or password', 'warn')
-            return redirect(url_for('admin_bp.login'))
 
         return render_template('loginPage.html')
 
