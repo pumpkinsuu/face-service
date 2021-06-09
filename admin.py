@@ -7,7 +7,7 @@ from routes.admin import create_admin_bp
 from utilities import ErrorAPI, logger, response
 log = logger('face')
 
-app = Flask(__name__, static_folder='static')
+app = Flask(__name__)
 CORS(app)
 app.secret_key = SECRET
 app.debug = True
