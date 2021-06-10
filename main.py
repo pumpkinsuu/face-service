@@ -33,7 +33,7 @@ def check_request():
     data = admin_db.get_data({'key': api_key})
     if not data:
         raise ErrorAPI(401, 'invalid api_key')
-    g['collection'] = data['collection']
+    g.collection = data['collection']
 
 
 @app.route('/', methods=['GET'])

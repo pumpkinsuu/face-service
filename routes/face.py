@@ -90,7 +90,7 @@ def create_face_bp(app):
     @face_bp.route('/users/<userID>', methods=['GET'])
     def get_user(userID: str):
         user = face_db.get_user(
-            g['collection'],
+            g.collection,
             userID
         )
         if not user:
@@ -100,12 +100,12 @@ def create_face_bp(app):
 
     @face_bp.route('/count', methods=['GET'])
     def count():
-        total = face_db.count(g['collection'])
+        total = face_db.count(g.collection)
         return response(200, total)
 
     @face_bp.route('/users', methods=['GET'])
     def get_users():
-        ids, _ = face_db.get_users(g['collection'])
+        ids, _ = face_db.get_users(g.collection)
         return response(200, ids)
 
     @face_bp.route('/users/<userID>', methods=['POST', 'PUT'])
@@ -117,7 +117,7 @@ def create_face_bp(app):
         if 'right' not in request.form:
             raise ErrorAPI(400, 'missing "right"')
 
-        collection = g['collection']
+        collection = g.collection
 
         front = request.form['front']
         left = request.form['left']
@@ -160,7 +160,7 @@ def create_face_bp(app):
 
     @face_bp.route('/users/<userID>', methods=['DELETE'])
     def remove_user(userID: str):
-        collection = g['collection']
+        collection = g.collection
 
         if not face_db.get_user(collection, userID):
             raise ErrorAPI(404, 'user not registered')
@@ -172,7 +172,7 @@ def create_face_bp(app):
 
     @face_bp.route('/find', methods=['POST'])
     def find():
-        collection = g['collection']
+        collection = g.collection
 
         if 'images' not in request.form:
             raise ErrorAPI(400, 'missing "images"')
