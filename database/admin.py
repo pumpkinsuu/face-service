@@ -1,18 +1,15 @@
-from pymongo import MongoClient, TEXT, ASCENDING
+from pymongo import TEXT, ASCENDING
 from flask_pymongo import PyMongo
 import secrets
 
-from config.server import MONGO_URI, USER_DB
+from config.server import MONGO_URI, USER_DB, FACE_DB, MODELS
 from utilities import logger
 
 
 class AdminData:
-    def __init__(self, app=None):
-        uri = MONGO_URI + USER_DB
-        if app:
-            self.db = PyMongo(app, uri=uri).db.db
-        else:
-            self.db = MongoClient(uri).db
+    def __init__(self, app):
+        self.db = PyMongo(app, uri=MONGO_URI + USER_DB).db.db
+        self.face_db = PyMongo(app, uri=MONGO_URI + FACE_DB).db
 
         if self.db.count_documents({}) == 0:
             self.db.create_index([('collection', TEXT), ('key', TEXT)], unique=True)
@@ -71,6 +68,8 @@ class AdminData:
 
     def remove(self, collection: str):
         try:
+            for model in MODELS:
+                self.face_db.drop_collection(model + collection)
             self.db.delete_one({'collection': collection})
             return True
         except Exception as ex:

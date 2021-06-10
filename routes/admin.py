@@ -55,7 +55,7 @@ def create_admin_bp(app):
     def create():
         if request.method == 'POST':
             collection = request.form.get('collection')
-            if db.get_data(collection):
+            if db.get_data({'collection': collection}):
                 flash('Collection exist!', 'warn')
             elif db.create(collection):
                 flash('Created', 'info')

@@ -3,6 +3,7 @@
     facenet
     dlib
 """
+MODELS = ['dlib', 'facenet']
 MODEL = 'dlib'
 # Server
 HOST = '0.0.0.0'
