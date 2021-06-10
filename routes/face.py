@@ -98,6 +98,11 @@ def create_face_bp(app):
 
         return response(200, 'exist')
 
+    @face_bp.route('/count', methods=['GET'])
+    def count():
+        total = face_db.count(g['collection'])
+        return response(200, total)
+
     @face_bp.route('/users', methods=['GET'])
     def get_users():
         ids, _ = face_db.get_users(g['collection'])

@@ -25,7 +25,7 @@ def exception(e):
 
 admin_bp = create_admin_bp(app)
 CORS(admin_bp)
-app.register_blueprint(admin_bp, url_prefix='/')
+app.register_blueprint(admin_bp)
 
 
 if __name__ == '__main__':
