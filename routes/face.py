@@ -58,7 +58,7 @@ def create_face_bp(app):
                 if embed_db.get(i):
                     for x in data:
                         embed = embed_db.get(x)
-                        data[x] = np.array(json.loads(embed))
+                        data[x] = json.loads(embed)
                         embed_db.delete(x)
 
                     return list(data.values())
