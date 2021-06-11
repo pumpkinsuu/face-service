@@ -39,10 +39,7 @@ def update_service():
 
                 if db_ids:
                     dist, ids = find_min(embeds, db_embeds, METRIC)
-                    exist = np.any(db_ids[ids[dist < TOL]] != user['id'])
-                    print(dist)
-                    print(db_ids[ids[dist < TOL]])
-                    print(exist)
+                    exist = np.any(np.array(db_ids)[ids[dist < TOL]] != user['id'])
                 else:
                     exist = False
 
@@ -67,7 +64,6 @@ def update_service():
                 sleep(UPDATE_SLEEP)
 
         except Exception as ex:
-            print(str(ex))
             log.info(ex, exc_info=True)
 
 
