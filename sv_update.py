@@ -23,7 +23,7 @@ def update_service():
         db=REDIS_UPDATE_DB
     )
     db.flushall()
-    log = logger('sv_update.py')
+    log = logger('update')
     find_min = get_method()
 
     while True:
