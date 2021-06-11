@@ -1,5 +1,5 @@
 import face_recognition as fr
-from utilities.api import b64ToArray, l2_normalize
+from utilities.face import b64ToArray, l2_normalize
 
 NAME = 'dlib'
 INPUT = (150, 150)

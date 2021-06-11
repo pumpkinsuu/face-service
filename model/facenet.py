@@ -1,5 +1,5 @@
 import tensorflow as tf
-from utilities.api import b64ToArray, l2_normalize
+from utilities.face import b64ToArray, l2_normalize
 import numpy as np
 
 NAME = 'facenet'
