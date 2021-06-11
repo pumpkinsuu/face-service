@@ -28,7 +28,7 @@ EMBED_SIZE = 3
 EMBED_SLEEP = 0.2
 # Register
 UPDATE_INPUT = 'users'
-UPDATE_SLEEP = 0.5
+UPDATE_SLEEP = 0.3
 # Mongo
 MONGO_URI = f"mongodb+srv://admin:AdminPass123" \
             f"@cluster0.qe6sa.mongodb.net/"
