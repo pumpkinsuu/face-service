@@ -36,6 +36,8 @@ def update_service():
                 embeds = np.array(user['embeds'])
 
                 db_ids, db_embeds = face_db.get_users(req['collection'])
+                print(req['collection'])
+                print(db_ids)
                 if db_ids:
                     dist, ids = find_min(embeds, db_embeds, METRIC)
                     exist = np.any(db_ids[ids[dist < TOL]] != user['id'])
