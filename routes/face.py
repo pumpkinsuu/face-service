@@ -61,7 +61,7 @@ def create_face_bp(app):
                         data[x] = np.array(json.loads(embed))
                         embed_db.delete(x)
 
-                    return np.array(list(data.values()))
+                    return list(data.values())
 
                 sleep(REQUEST_SLEEP)
                 t += REQUEST_SLEEP
