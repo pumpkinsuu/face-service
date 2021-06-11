@@ -209,7 +209,7 @@ def create_face_bp(app):
         users[dist >= TOL] = ''
 
         data = {
-            'users': users,
+            'users': users.tolist(),
             'valid': check_t - g.start,
             'embed': embed_t - check_t,
             'search': time() - embed_t,
