@@ -198,7 +198,7 @@ def create_face_bp(app):
 
         db_ids, db_embeds = face_db.get_users(collection)
         if not db_ids:
-            raise ErrorAPI(500, 'no face registered')
+            raise ErrorAPI(400, 'no face registered')
         check_t = time()
 
         embeds = get_embed(images)
