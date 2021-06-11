@@ -2,8 +2,10 @@ tensorflow
 face_recognition
 flask
 flask-cors
-pymongo
 flask-pymongo
 flask-login
-pymongo[srv]
 redis
+pymongo
+pymongo[srv]
+pillow
+scipy

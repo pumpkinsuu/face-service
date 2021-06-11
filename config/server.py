@@ -1,10 +1,17 @@
 # Model
-"""
-    facenet
-    dlib
-"""
 MODELS = ['dlib', 'facenet']
 MODEL = 'dlib'
+"""
+    euclidean
+    cosine
+"""
+METRIC = 'euclidean'
+"""
+    mean_first
+    mean_later
+    min_later
+"""
+METHOD = 'mean_first'
 # Server
 HOST = '0.0.0.0'
 PORT = 5001

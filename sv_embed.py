@@ -5,7 +5,7 @@ import numpy as np
 
 from config.server import *
 
-from utilities import logger
+from utilities.api import logger
 
 
 def embed_service():

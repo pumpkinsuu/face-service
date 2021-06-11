@@ -4,7 +4,7 @@ from flask_cors import CORS
 from config.admin import *
 
 from routes.admin import create_admin_bp
-from utilities import ErrorAPI, logger, response
+from utilities.api import ErrorAPI, logger, response
 log = logger('admin')
 
 app = Flask(__name__)

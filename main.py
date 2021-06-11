@@ -1,11 +1,12 @@
 from flask import Flask, request, g
 from flask_cors import CORS
+from time import time
 
 from config.server import *
 
 from routes.face import create_face_bp
 from database.admin import AdminData
-from utilities import ErrorAPI, response, logger
+from utilities.api import ErrorAPI, response, logger
 log = logger('face')
 
 app = Flask(__name__)
@@ -26,6 +27,8 @@ def exception(e):
 
 @app.before_request
 def check_request():
+    g.start = time()
+
     if 'api_key' not in request.headers:
         raise ErrorAPI(400, 'no api_key provided')
     api_key = request.headers['api_key']

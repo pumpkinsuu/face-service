@@ -3,7 +3,7 @@ from flask_pymongo import PyMongo
 import secrets
 
 from config.server import MONGO_URI, USER_DB, FACE_DB, MODELS
-from utilities import logger
+from utilities.api import logger
 
 
 class AdminData:

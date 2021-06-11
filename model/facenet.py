@@ -1,5 +1,5 @@
 import tensorflow as tf
-from utilities import b64ToArray
+from utilities.api import b64ToArray, l2_normalize
 import numpy as np
 
 NAME = 'facenet'
@@ -15,11 +15,6 @@ def prewhiten(x):
     std_adj = np.maximum(std, 1.0 / np.sqrt(x.size))
     y = np.multiply(np.subtract(x, mean), 1 / std_adj)
     return y
-
-
-def l2_normalize(x, axis=-1, epsilon=1e-10):
-    output = x / np.sqrt(np.maximum(np.sum(np.square(x), axis=axis, keepdims=True), epsilon))
-    return output
 
 
 def load_pb(path):

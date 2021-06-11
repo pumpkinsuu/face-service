@@ -4,7 +4,7 @@ import numpy as np
 
 from config.server import FACE_URI, FACE_DB
 
-from utilities import logger
+from utilities.api import logger
 
 
 class FaceData:
@@ -36,11 +36,11 @@ class FaceData:
         results = self.db[self.model_name + collection].find()
 
         ids = [None] * size
-        embeds = np.empty((size, self.model_output))
+        embeds = np.empty((size, 3, self.model_output))
 
         for i in range(size):
             ids[i] = results[i]['id']
-            embeds[i] = results[i]['embed']
+            embeds[i] = results[i]['embeds']
 
         return ids, embeds
 
@@ -68,7 +68,7 @@ class FaceData:
                 },
                 {
                     "$set": {
-                        'embed': user['embed']
+                        'embeds': user['embeds']
                     }
                 }
             )

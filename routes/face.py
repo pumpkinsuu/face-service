@@ -1,14 +1,16 @@
 from flask import request, Blueprint, g
 from uuid import uuid4
 import json
-from time import sleep
+from time import sleep, time
 from redis import StrictRedis
+from scipy.spatial.distance import cdist
+import numpy as np
 
 from config.server import *
 
 from database.face import FaceData
-from utilities import *
-log = logger('face.py')
+from utilities.api import logger, ErrorAPI, response
+from utilities.face_method import get_method
 
 
 def create_face_bp(app):
@@ -18,6 +20,9 @@ def create_face_bp(app):
         from model.dlib import preprocess, NAME, OUTPUT, TOL
     else:
         from model.facenet import preprocess, NAME, OUTPUT, TOL
+
+    log = logger('face.py')
+    find_min = get_method()
 
     face_db = FaceData(NAME, OUTPUT, app)
 
@@ -56,7 +61,7 @@ def create_face_bp(app):
                         data[x] = np.array(json.loads(embed))
                         embed_db.delete(x)
 
-                    return list(data.values())
+                    return np.array(list(data.values()))
 
                 sleep(REQUEST_SLEEP)
                 t += REQUEST_SLEEP
@@ -93,20 +98,17 @@ def create_face_bp(app):
             g.collection,
             userID
         )
-        if not user:
-            raise ErrorAPI(404, 'user not found')
-
-        return response(200, 'exist')
+        return response(200, {'status': bool(user)})
 
     @face_bp.route('/count', methods=['GET'])
     def count():
         total = face_db.count(g.collection)
-        return response(200, total)
+        return response(200, {'total': total})
 
     @face_bp.route('/users', methods=['GET'])
     def get_users():
         ids, _ = face_db.get_users(g.collection)
-        return response(200, ids)
+        return response(200, {'users': ids})
 
     @face_bp.route('/users/<userID>', methods=['POST', 'PUT'])
     def update_user(userID: str):
@@ -122,15 +124,22 @@ def create_face_bp(app):
         front = request.form['front']
         left = request.form['left']
         right = request.form['right']
+        check_t = time()
 
         front, left, right = get_embed([front, left, right])
+        embed_t = time()
 
-        if distance(front, left) > TOL or distance(front, right) > TOL:
+        dist = cdist(
+            np.array([front]),
+            np.array([left, right]),
+            METRIC
+        ).max()
+        if dist > TOL:
             raise ErrorAPI(400, 'different person')
 
         user = {
             'id': userID,
-            'embed': mean([front, left, right])
+            'embeds': [front, left, right]
         }
 
         if request.method == 'POST':
@@ -141,6 +150,7 @@ def create_face_bp(app):
                 user=user,
                 new=True
             )
+            msg = 'created'
         else:
             if not face_db.get_user(collection, userID):
                 raise ErrorAPI(404, 'user not registered')
@@ -149,14 +159,21 @@ def create_face_bp(app):
                 user=user,
                 new=False
             )
+            msg = 'updated'
 
         if status == 409:
             raise ErrorAPI(409, 'face already exists')
-
         if status == 500:
             raise ErrorAPI(500, 'failed')
 
-        return response(status, 'success')
+        data = {
+            'status': msg,
+            'api': check_t - g.start,
+            'embed': embed_t - check_t,
+            'search': time() - embed_t,
+            'total': time() - g.start
+        }
+        return response(status, data)
 
     @face_bp.route('/users/<userID>', methods=['DELETE'])
     def remove_user(userID: str):
@@ -165,10 +182,8 @@ def create_face_bp(app):
         if not face_db.get_user(collection, userID):
             raise ErrorAPI(404, 'user not registered')
 
-        if not face_db.remove(collection, userID):
-            raise ErrorAPI(500, 'failed')
-
-        return response(200, 'success')
+        status = face_db.remove(collection, userID)
+        return response(200, {'status': status})
 
     @face_bp.route('/find', methods=['POST'])
     def find():
@@ -184,18 +199,22 @@ def create_face_bp(app):
         db_ids, db_embeds = face_db.get_users(collection)
         if not db_ids:
             raise ErrorAPI(500, 'no face registered')
+        check_t = time()
 
         embeds = get_embed(images)
-        ids = []
+        embed_t = time()
 
-        for embed in embeds:
-            idx, dist = find_min(embed, db_embeds)
+        dist, ids = find_min(embeds, db_embeds, METRIC)
+        users = np.array(db_ids)[ids]
+        users[dist >= TOL] = ''
 
-            if dist < TOL:
-                ids.append(db_ids[idx])
-            else:
-                ids.append('')
-
-        return response(200, ids)
+        data = {
+            'users': users,
+            'valid': check_t - g.start,
+            'embed': embed_t - check_t,
+            'search': time() - embed_t,
+            'total': time() - g.start
+        }
+        return response(200, data)
 
     return face_bp

@@ -6,7 +6,8 @@ import numpy as np
 from config.server import *
 
 from database.face import FaceData
-from utilities import logger, find_min
+from utilities.api import logger
+from utilities.face_method import get_method
 
 
 def update_service():
@@ -23,6 +24,7 @@ def update_service():
     )
     db.flushall()
     log = logger('sv_update.py')
+    find_min = get_method()
 
     while True:
         try:
@@ -31,31 +33,30 @@ def update_service():
             if req:
                 req = json.loads(req)
                 user = req['user']
+                embeds = np.array(user['embeds'])
 
-                ids, embeds = face_db.get_users(req['collection'])
+                db_ids, db_embeds = face_db.get_users(req['collection'])
+                if db_ids:
+                    dist, ids = find_min(embeds, db_embeds, METRIC)
+                    exist = np.any(db_ids[ids[dist < TOL]] != user['id'])
+                else:
+                    exist = False
 
-                idx = -1
-                dist = 0
-                if ids:
-                    idx, dist = find_min(np.array(user['embed']), embeds)
-
-                code = 409
-                if req['new']:
-                    if idx == -1 or dist > TOL:
-                        code = 500
-                        if face_db.create(
-                                req['collection'],
-                                user
-                        ):
-                            code = 201
-                elif idx != -1:
-                    if dist > TOL or ids[idx] == user['id']:
-                        code = 500
-                        if face_db.update(
-                            req['collection'],
-                            user
-                        ):
-                            code = 200
+                code = 500
+                if exist:
+                    code = 409
+                elif req['new']:
+                    if face_db.create(
+                        req['collection'],
+                        user
+                    ):
+                        code = 201
+                else:
+                    if face_db.update(
+                        req['collection'],
+                        user
+                    ):
+                        code = 200
 
                 db.set(req['id'], code)
             else:
