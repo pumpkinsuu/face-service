@@ -23,7 +23,7 @@ def update_service():
         db=REDIS_UPDATE_DB
     )
     db.flushall()
-    log = logger('update')
+    log = logger()
     find_min = get_method()
 
     while True:
@@ -64,7 +64,7 @@ def update_service():
                 sleep(UPDATE_SLEEP)
 
         except Exception as ex:
-            log.info(ex, exc_info=True)
+            log.exception(ex)
 
 
 if __name__ == "__main__":
