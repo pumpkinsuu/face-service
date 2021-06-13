@@ -3,7 +3,7 @@ from uuid import uuid4
 import json
 from time import sleep, time
 from redis import StrictRedis
-from scipy.spatial.distance import cdist
+from scipy.spatial.distance import cdist, euclidean, cosine
 import numpy as np
 
 from config.server import *
@@ -21,7 +21,7 @@ def create_face_bp(app):
     else:
         from model.facenet import preprocess, NAME, OUTPUT, TOL
 
-    log = logger('face.py')
+    log = logger()
     find_min = get_method()
 
     face_db = FaceData(NAME, OUTPUT, app)
@@ -41,9 +41,6 @@ def create_face_bp(app):
         data = {}
         i = ''
         for img in images:
-            if not img:
-                raise ErrorAPI(400, 'image empty')
-
             i = str(uuid4())
             data[i] = []
             req = {
@@ -52,9 +49,9 @@ def create_face_bp(app):
             }
             embed_db.rpush(EMBED_INPUT, json.dumps(req))
 
-        t = 0
-        while t < TIMEOUT:
-            try:
+        try:
+            t = 0
+            while t < TIMEOUT:
                 if embed_db.get(i):
                     for x in data:
                         embed = embed_db.get(x)
@@ -65,12 +62,14 @@ def create_face_bp(app):
 
                 sleep(REQUEST_SLEEP)
                 t += REQUEST_SLEEP
-            except Exception as ex:
-                for x in data:
-                    embed_db.delete(x)
 
-                log.info(str(ex), exc_info=True)
-                raise ErrorAPI(500, str(ex))
+            raise Exception('embedding timeout')
+        except Exception as ex:
+            for x in data:
+                embed_db.delete(x)
+
+            log.exception()
+            raise ErrorAPI(500, ex)
 
     def update(collection, user, new):
         req = {
@@ -81,16 +80,24 @@ def create_face_bp(app):
         }
         update_db.rpush(UPDATE_INPUT, json.dumps(req))
 
-        t = 0
-        while t < TIMEOUT:
-            res = update_db.get(req['id'])
+        try:
+            t = 0
+            while t < TIMEOUT:
+                res = update_db.get(req['id'])
 
-            if res:
-                update_db.delete(req['id'])
-                return int(res)
+                if res:
+                    update_db.delete(req['id'])
+                    return int(res)
 
-            sleep(REQUEST_SLEEP)
-            t += REQUEST_SLEEP
+                sleep(REQUEST_SLEEP)
+                t += REQUEST_SLEEP
+
+            raise Exception('updating timeout')
+        except Exception as ex:
+            update_db.delete(req['id'])
+
+            log.exception()
+            raise ErrorAPI(500, ex)
 
     @face_bp.route('/users/<userID>', methods=['GET'])
     def get_user(userID: str):
@@ -112,18 +119,17 @@ def create_face_bp(app):
 
     @face_bp.route('/users/<userID>', methods=['POST', 'PUT'])
     def update_user(userID: str):
-        if 'front' not in request.form:
-            raise ErrorAPI(400, 'missing "front"')
-        if 'left' not in request.form:
-            raise ErrorAPI(400, 'missing "left"')
-        if 'right' not in request.form:
-            raise ErrorAPI(400, 'missing "right"')
+        front = request.form.get('front')
+        if not front:
+            raise ErrorAPI(400, 'missing front')
+        left = request.form.get('left')
+        if not left:
+            raise ErrorAPI(400, 'missing left')
+        right = request.form.get('right')
+        if not right:
+            raise ErrorAPI(400, 'missing right')
 
         collection = g.collection
-
-        front = request.form['front']
-        left = request.form['left']
-        right = request.form['right']
         check_t = time()
 
         front, left, right = get_embed([front, left, right])
@@ -168,9 +174,9 @@ def create_face_bp(app):
 
         data = {
             'status': msg,
-            'api': check_t - g.start,
+            'valid': check_t - g.start,
             'embed': embed_t - check_t,
-            'search': time() - embed_t,
+            'update': time() - embed_t,
             'total': time() - g.start
         }
         return response(status, data)
@@ -182,19 +188,19 @@ def create_face_bp(app):
         if not face_db.get_user(collection, userID):
             raise ErrorAPI(404, 'user not registered')
 
-        status = face_db.remove(collection, userID)
-        return response(200, {'status': status})
+        if not face_db.remove(collection, userID):
+            raise ErrorAPI(500, 'failed')
+        return response(200, {'status': 'removed'})
 
     @face_bp.route('/find', methods=['POST'])
     def find():
         collection = g.collection
 
-        if 'images' not in request.form:
-            raise ErrorAPI(400, 'missing "images"')
-
         images = request.form.getlist('images')
+        if not images:
+            raise ErrorAPI(400, 'missing images')
         if not isinstance(images, list):
-            raise ErrorAPI(400, '"images" not list')
+            raise ErrorAPI(400, 'images not list')
 
         db_ids, db_embeds = face_db.get_users(collection)
         if not db_ids:
@@ -216,5 +222,24 @@ def create_face_bp(app):
             'total': time() - g.start
         }
         return response(200, data)
+
+    if METRIC == 'cosine':
+        distance = cosine
+    else:
+        distance = euclidean
+
+    @face_bp.route('/verify', methods=['POST'])
+    def verify():
+        image1 = request.form.get('image1')
+        if not image1:
+            raise ErrorAPI(400, 'missing image1')
+        image2 = request.form.get('image2')
+        if not image2:
+            raise ErrorAPI(400, 'missing image2')
+
+        image1, image2 = get_embed([image1, image2])
+        result = distance(image1, image2) < TOL
+
+        return response(200, {'result': result})
 
     return face_bp

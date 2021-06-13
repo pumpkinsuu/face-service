@@ -2,10 +2,10 @@ import logging
 from flask import jsonify
 
 
-def logger(file):
+def logger():
     log = logging.getLogger()
-    log.setLevel(logging.INFO)
-    file = logging.FileHandler(f'{file}.log', mode='w+')
+    log.setLevel(logging.ERROR)
+    file = logging.FileHandler('error.log', mode='w+')
     file.setFormatter(
         logging.Formatter(
             '[%(asctime)s] — <%(name)s>: %(message)s',
