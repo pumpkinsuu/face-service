@@ -21,8 +21,8 @@ def error_api(e: ErrorAPI):
 
 @app.errorhandler(Exception)
 def exception(e):
-    log.info(str(e), exc_info=True)
-    return response(500, str(e))
+    log.exception(e)
+    return response(500, e)
 
 
 @app.before_request
