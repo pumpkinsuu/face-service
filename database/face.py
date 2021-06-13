@@ -19,7 +19,7 @@ class FaceData:
 
         self.model_name = model_name
         self.model_output = model_output
-        self.log = logger('faceDB')
+        self.log = logger()
 
     def get_user(self,
                  collection: str,
@@ -55,7 +55,7 @@ class FaceData:
 
             return True
         except Exception as ex:
-            self.log.info(ex, exc_info=True)
+            self.log.exception(ex)
             return False
 
     def update(self,
@@ -74,42 +74,14 @@ class FaceData:
             )
             return True
         except Exception as ex:
-            self.log.info(ex, exc_info=True)
+            self.log.exception(ex)
             return False
 
     def remove(self,
                collection: str,
                user_id: str):
-        try:
-            self.db[self.model_name + collection].delete_one({'id': user_id})
-            return True
-        except Exception as ex:
-            self.log.info(ex, exc_info=True)
-            return False
+        self.db[self.model_name + collection].delete_one({'id': user_id})
 
     def count(self,
               collection: str):
-        try:
-            return self.db[self.model_name + collection].count_documents({})
-        except Exception as ex:
-            self.log.info(ex, exc_info=True)
-            return -1
-
-    def rename(self,
-               collection: str,
-               name: str):
-        try:
-            self.db[self.model_name + collection].rename(name)
-            return True
-        except Exception as ex:
-            self.log.info(ex, exc_info=True)
-            return False
-
-    def drop(self,
-             collection: str):
-        try:
-            self.db.drop_collection(self.model_name + collection)
-            return True
-        except Exception as ex:
-            self.log.info(ex, exc_info=True)
-            return False
+        return self.db[self.model_name + collection].count_documents({})

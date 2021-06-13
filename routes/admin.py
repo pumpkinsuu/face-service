@@ -81,7 +81,8 @@ def create_admin_bp(app):
     @admin_bp.route('/collection/<collection>/remove', methods=['POST'])
     @login_required
     def remove(collection):
-        if db.remove(collection):
+        db.remove(collection)
+        if not db.get_data({'collection': collection}):
             flash('Removed', 'info')
             return redirect(url_for('admin_bp.main'))
         else:

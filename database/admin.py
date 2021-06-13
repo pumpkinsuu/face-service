@@ -14,7 +14,7 @@ class AdminData:
         if self.db.count_documents({}) == 0:
             self.db.create_index([('collection', TEXT), ('key', TEXT)], unique=True)
 
-        self.log = logger('adminDB')
+        self.log = logger()
 
     def get_data(self, data: dict):
         return self.db.find_one(data)
@@ -42,7 +42,7 @@ class AdminData:
             })
             return key
         except Exception as ex:
-            self.log.info(ex, exc_info=True)
+            self.log.exception(ex)
             return ''
 
     def update(self, collection: str):
@@ -63,15 +63,10 @@ class AdminData:
             )
             return key
         except Exception as ex:
-            self.log.info(ex, exc_info=True)
+            self.log.exception(ex)
             return ''
 
     def remove(self, collection: str):
-        try:
-            for model in MODELS:
-                self.face_db.drop_collection(model + collection)
-            self.db.delete_one({'collection': collection})
-            return True
-        except Exception as ex:
-            self.log.info(ex, exc_info=True)
-            return False
+        for model in MODELS:
+            self.face_db.drop_collection(model + collection)
+        self.db.delete_one({'collection': collection})
