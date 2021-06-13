@@ -188,8 +188,7 @@ def create_face_bp(app):
         if not face_db.get_user(collection, userID):
             raise ErrorAPI(404, 'user not registered')
 
-        face_db.remove(collection, userID)
-        if face_db.get_user(collection, userID):
+        if not face_db.remove(collection, userID):
             raise ErrorAPI(500, 'failed')
 
         return response(200, {'status': 'removed'})

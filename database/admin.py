@@ -67,6 +67,10 @@ class AdminData:
             return ''
 
     def remove(self, collection: str):
+        data = {'collection': collection}
         for model in MODELS:
             self.face_db.drop_collection(model + collection)
-        self.db.delete_one({'collection': collection})
+
+        self.db.delete_one(data)
+
+        return self.db.find_one(data)
