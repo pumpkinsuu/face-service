@@ -3,7 +3,7 @@ from uuid import uuid4
 import json
 from time import sleep, time
 from redis import StrictRedis
-from scipy.spatial.distance import cdist, euclidean, cosine
+from scipy.spatial.distance import cdist
 import numpy as np
 
 from config.server import *
@@ -224,22 +224,27 @@ def create_face_bp(app):
         }
         return response(200, data)
 
-    if METRIC == 'cosine':
-        distance = cosine
-    else:
-        distance = euclidean
-
     @face_bp.route('/verify', methods=['POST'])
     def verify():
-        image1 = request.form.get('image1')
-        if not image1:
-            raise ErrorAPI(400, 'missing image1')
-        image2 = request.form.get('image2')
-        if not image2:
-            raise ErrorAPI(400, 'missing image2')
+        collection = g.collection
 
-        image1, image2 = get_embed([image1, image2])
-        result = distance(image1, image2) < TOL
+        userID = request.form.get('userID')
+        if not userID:
+            raise ErrorAPI(400, 'missing userID')
+
+        user = face_db.get_user(collection, userID)
+        if not user:
+            raise ErrorAPI(404, 'user not exist')
+
+        images = request.form.getlist('images')
+        if not images:
+            raise ErrorAPI(400, 'missing images')
+        if not isinstance(images, list):
+            raise ErrorAPI(400, 'images not list')
+
+        embeds = get_embed(images)
+        dist, _ = find_min(embeds, np.array([user['embeds']]), METRIC)
+        result = np.any(dist >= TOL)
 
         return response(200, {'result': result})
 
