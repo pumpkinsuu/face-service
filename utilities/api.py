@@ -4,7 +4,7 @@ from flask import jsonify
 
 def logger():
     log = logging.getLogger()
-    log.setLevel(logging.ERROR)
+    log.setLevel(logging.INFO)
     file = logging.FileHandler('error.log', mode='w+')
     file.setFormatter(
         logging.Formatter(
