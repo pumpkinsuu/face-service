@@ -96,7 +96,7 @@ def create_face_bp(app):
         except Exception as ex:
             update_db.delete(req['id'])
 
-            log.exception()
+            log.exception(ex)
             raise ErrorAPI(500, ex)
 
     @face_bp.route('/users/<userID>', methods=['GET'])
