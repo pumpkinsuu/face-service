@@ -68,7 +68,7 @@ def create_face_bp(app):
             for x in data:
                 embed_db.delete(x)
 
-            log.exception()
+            log.exception(ex)
             raise ErrorAPI(500, ex)
 
     def update(collection, user, new):
