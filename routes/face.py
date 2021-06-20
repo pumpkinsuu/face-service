@@ -246,6 +246,6 @@ def create_face_bp(app):
         dist, _ = find_min(embeds, np.array([user['embeds']]), METRIC)
         result = np.any(dist >= TOL)
 
-        return response(200, {'result': result})
+        return response(200, {'result': bool(result)})
 
     return face_bp
