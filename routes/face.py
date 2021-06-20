@@ -244,7 +244,7 @@ def create_face_bp(app):
 
         embeds = get_embed(images)
         dist, _ = find_min(embeds, np.array([user['embeds']]), METRIC)
-        result = np.any(dist >= TOL)
+        result = np.all(dist < TOL)
 
         return response(200, {'result': bool(result)})
 
