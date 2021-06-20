@@ -44,9 +44,15 @@ def create_face_bp(app):
         for img in images:
             i = str(uuid4())
             data[i] = []
+
+            try:
+                img = preprocess(img)
+            except UnidentifiedImageError:
+                raise ErrorAPI(400, 'unidentified image')
+
             req = {
                 'id': i,
-                'image': preprocess(img)
+                'image': img
             }
             embed_db.rpush(EMBED_INPUT, json.dumps(req))
 
@@ -65,8 +71,6 @@ def create_face_bp(app):
                 t += REQUEST_SLEEP
 
             raise Exception('embedding timeout')
-        except UnidentifiedImageError:
-            raise ErrorAPI(400, 'unidentified image')
         except Exception as ex:
             for x in data:
                 embed_db.delete(x)
