@@ -5,7 +5,7 @@ from config.admin import *
 
 from routes.admin import create_admin_bp
 from utilities.api import ErrorAPI, logger, response
-log = logger('admin')
+log = logger()
 
 app = Flask(__name__)
 CORS(app)
