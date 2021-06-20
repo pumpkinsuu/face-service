@@ -7,7 +7,7 @@ from config.server import *
 from routes.face import create_face_bp
 from database.admin import AdminData
 from utilities.api import ErrorAPI, response, logger
-log = logger('face')
+log = logger()
 
 app = Flask(__name__)
 CORS(app)
