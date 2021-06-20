@@ -5,6 +5,7 @@ from time import sleep, time
 from redis import StrictRedis
 from scipy.spatial.distance import cdist
 import numpy as np
+from PIL import UnidentifiedImageError
 
 from config.server import *
 
@@ -64,6 +65,8 @@ def create_face_bp(app):
                 t += REQUEST_SLEEP
 
             raise Exception('embedding timeout')
+        except UnidentifiedImageError:
+            raise ErrorAPI(400, 'unidentified image')
         except Exception as ex:
             for x in data:
                 embed_db.delete(x)
