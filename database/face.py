@@ -81,7 +81,7 @@ class FaceData:
                collection: str,
                user_id: str):
         self.db[self.model_name + collection].delete_one({'id': user_id})
-        return self.db[self.model_name + collection].find_one({'id': user_id})
+        return not self.db[self.model_name + collection].find_one({'id': user_id})
 
     def count(self,
               collection: str):

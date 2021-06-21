@@ -73,4 +73,4 @@ class AdminData:
 
         self.db.delete_one(data)
 
-        return self.db.find_one(data)
+        return not self.db.find_one(data)
