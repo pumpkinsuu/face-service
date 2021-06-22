@@ -1,3 +1,4 @@
 python3 sv_embed.py &
 python3 sv_update.py &
 gunicorn --workers=2 --bind 0.0.0.0:5001 wsgi:app &
+gunicorn --workers=1 --bind 0.0.0.0:7001 admin:app &
