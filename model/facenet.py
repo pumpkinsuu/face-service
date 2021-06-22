@@ -1,11 +1,15 @@
 import tensorflow as tf
 from utilities.face import b64ToArray, l2_normalize
+from config.server import METRIC
 import numpy as np
 
 NAME = 'facenet'
 INPUT = (160, 160)
 OUTPUT = 512
-TOL = 0.7
+if METRIC == 'cosine':
+    TOL = 0.3
+else:
+    TOL = 0.7
 MODEL_PATH = 'model/data/facenet.pb'
 
 

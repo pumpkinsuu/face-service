@@ -1,10 +1,14 @@
 import face_recognition as fr
 from utilities.face import b64ToArray, l2_normalize
+from config.server import METRIC
 
 NAME = 'dlib'
 INPUT = (150, 150)
 OUTPUT = 128
-TOL = 0.37
+if METRIC == 'cosine':
+    TOL = 0.06
+else:
+    TOL = 0.37
 FACE_LOCATION = [(0, 150, 150, 0)]
 
 
