@@ -33,7 +33,5 @@ UPDATE_SLEEP = 0.1
 MONGO_URI = f"mongodb+srv://admin:AdminPass123" \
             f"@cluster0.qe6sa.mongodb.net/"
 FACE_DB = 'face_db'
-FACE_URI = f"mongodb+srv://admin:AdminPass123" \
-            f"@cluster0.qe6sa.mongodb.net/{FACE_DB}" \
-            f"?retryWrites=true&w=majority"
+FACE_URI = MONGO_URI + FACE_DB + "?retryWrites=true&w=majority"
 USER_DB = 'user_db'

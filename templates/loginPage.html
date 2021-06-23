@@ -153,14 +153,7 @@
       bottom: 0;
       padding: 100px 40px 40px 40px;
       background: #35394a;
-      /* Old browsers */
-      /* FF3.6+ */
-      /* Chrome,Safari4+ */
-      /* Chrome10+,Safari5.1+ */
-      /* Opera 11.10+ */
-      /* IE10+ */
       background: linear-gradient(45deg, #35394a 0%, #1f222e 100%);
-      /* W3C */
       filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#35394a", endColorstr="#1f222e", GradientType=1);
       box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
     }
@@ -206,7 +199,7 @@
       color: #DC6180 !important;
     }
 
-    body .login_fields input[type=email],
+    body .login_fields input[type=text],
     body .login_fields input[type=password] {
       color: #afb1be;
       width: -webkit-fill-available;
@@ -311,10 +304,33 @@
     .brand img {
       width: 30px;
     }
+
+    .alert{
+      position: absolute;
+      top: 5%;
+      right: 5%;
+      z-index: 2;
+      color: #DC6180;
+      border: 2px solid #DC6180;
+      padding: 20px;
+      background: linear-gradient(45deg, #35394a 0%, #1f222e 100%);
+      filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#35394a", endColorstr="#1f222e", GradientType=1);
+      box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    }
   </style>
 </head>
 
 <body class="text-center">
+
+  {% with msg = get_flashed_messages(category_filter=["warn"])[-1] %}
+    {% if msg %}
+    <div class="alert">
+      <span>{{ msg }}</span>
+    </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- background -->
   <div class="background" id="background">
   <div class='brand'>
     <a href='https://courses.fit.hcmus.edu.vn' target='_blank'>
@@ -324,6 +340,7 @@
   <div></div>
   </div>
 
+  <!-- body -->
   <div class="container">
     <div class="logouni" style="z-index: 1;"><img
         src="https://courses.fit.hcmus.edu.vn/pluginfile.php/1/core_admin/logo/0x200/1623341609/logo_dat_kem_voi_logo_truong.png"
@@ -337,10 +354,11 @@
           <div class='icon' >
             <img src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/217233/user_icon_copy.png'>
           </div>
-          <input name="username" id="username" required placeholder='Username' type='email'>
+          <input name="username" id="username" required placeholder='Username' type='text'>
           <div class='validation'>
             <img src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/217233/tick.png'>
           </div>
+          </input>
         </div>
         <div class='login_fields__password'>
           <div class='icon'>
@@ -365,6 +383,9 @@
   <div class='love'>
   </div>
   <script>
+    setTimeout(() => {
+      $(".alert").hide("blind",2000);
+    },3000)
     $(".background").click(()=>{
       $('.logouni').show( 500);
       $('.login').css("left","34%");
@@ -378,7 +399,7 @@
       $('.login').css("left","0");
     })
     $('input[type="submit"]').click(function (e) {
-      
+
       if ($('#password').val() === "" || $('#username').val() === "") {
         return;
       }
