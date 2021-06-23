@@ -12,6 +12,11 @@ def create_admin_bp(app):
     login_manager = LoginManager()
     login_manager.init_app(app)
     login_manager.login_view = 'admin_bp.login'
+    login_manager.refresh_view = "admin_bp.login"
+    login_manager.needs_refresh_message = (
+        u"Session expired, please login again."
+    )
+    login_manager.needs_refresh_message_category = "warn"
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -35,7 +40,7 @@ def create_admin_bp(app):
                 user = User(USERNAME)
                 login_user(user)
                 return redirect(url_for('admin_bp.main'))
-            flash('Invalid username or password', 'warn')
+            flash('Invalid username or password!', 'warn')
 
         return render_template('loginPage.html')
 
@@ -58,10 +63,10 @@ def create_admin_bp(app):
             if db.get_data({'collection': collection}):
                 flash('Collection exist!', 'warn')
             elif db.create(collection):
-                flash('Created', 'info')
+                flash('Success!', 'info')
                 return redirect(url_for('admin_bp.update', collection=collection))
             else:
-                flash('Failed to create', 'error')
+                flash('Failed to create!', 'error')
         return render_template('addPage.html')
 
     @admin_bp.route('/collection/<collection>', methods=['GET', 'POST'])
@@ -69,9 +74,9 @@ def create_admin_bp(app):
     def update(collection):
         if request.method == 'POST':
             if db.update(collection):
-                flash('Updated', 'info')
+                flash('Updated!', 'info')
             else:
-                flash('Failed to update', 'error')
+                flash('Failed to update!', 'error')
 
         data = db.get_data({'collection': collection})
         if not data:
@@ -82,10 +87,10 @@ def create_admin_bp(app):
     @login_required
     def remove(collection):
         if db.remove(collection):
-            flash('Removed', 'info')
+            flash(f'Removed {collection}!', 'info')
             return redirect(url_for('admin_bp.main'))
         else:
-            flash('Failed to remove', 'error')
+            flash('Failed to remove!', 'error')
             return redirect(url_for('admin_bp.update', collection=collection))
 
     @admin_bp.route('/search')

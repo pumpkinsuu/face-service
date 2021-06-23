@@ -40,6 +40,7 @@
 
 
     <!-- Custom styles for this template -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" integrity="sha512-5A8nwdMOWrSz20fDsjczgUidUBR8liPYU+WymTZP1lmY9G6Oc7HlZv156XqnsgNUzTyMefFTcsFH/tnJE/+xBg==" />
     <link href="/static/styles/sidebars.css" rel="stylesheet">
 </head>
 
@@ -48,22 +49,20 @@
     <main>
 
         <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 100%;height:100vh;">
+            <p class="logo">FIT@HCMUS</p>
             <a href="{{ url_for('admin_bp.main') }}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-                <span class="fs-4">Collection</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-anchor"><circle cx="12" cy="5" r="3"/><line x1="12" y1="22" x2="12" y2="8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/></svg>
+                &nbsp; &nbsp;<span class="fs-4"> Collection</span>
             </a>
             <hr>
             <ul class="nav nav-pills flex-column mb-auto">
                 <li class="nav-item">
                     <a href="{{ url_for('admin_bp.main') }}" class="nav-link active" aria-current="page">
-                        <svg class="bi me-2" width="16" height="16">
-                            <use xlink:href="#home" />
-                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                         Home
                     </a>
                     <a href="{{ url_for('admin_bp.create') }}" class="nav-link" aria-current="page">
-                        <svg class="bi me-2" width="16" height="16">
-                            <use xlink:href="#home" />
-                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-square"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
                         Add
                     </a>
                 </li>
@@ -72,7 +71,7 @@
             <div class="dropdown">
                 <a href="{{ url_for('admin_bp.logout') }}" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
                     id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                    <strong>admin</strong>
+                    <strong>{{ current_user.id }}</strong>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
 
@@ -88,17 +87,8 @@
             </div>
             <button type="button" class="btn btn-primary"><a href="{{ url_for('admin_bp.create') }}">Add A Collection</a></button>
         </div>
+        <hr class="myline">
 
-        <form class="input-group mb-2 mt-5" action="{{ url_for('admin_bp.search', keyword=keyword) }}">
-            <span class="input-group-text" id="basic-addon1"><svg xmlns="http://www.w3.org/2000/svg" width="16"
-                    height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                    <path
-                        d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
-                </svg></span>
-            <input type="text" class="form-control" placeholder="Search Collection" aria-label="url"
-                aria-describedby="basic-addon1" name="keyword" required>
-            <button class="btn btn-primary" type="submit">Search</button>
-        </form>
         <div>
           {% with msg = get_flashed_messages(category_filter=["info"])[-1] %}
             {% if msg %}
@@ -109,6 +99,17 @@
             {% endif %}
           {% endwith %}
         </div>
+
+        <form class="input-group mb-5 mt-5" action="{{ url_for('admin_bp.search', keyword=keyword) }}">
+            <span class="input-group-text" id="basic-addon1"><svg xmlns="http://www.w3.org/2000/svg" width="16"
+                    height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                    <path
+                        d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+                </svg></span>
+            <input type="text" class="form-control" placeholder="Search Collection" aria-label="url"
+                aria-describedby="basic-addon1" name="keyword" required>
+            <button class="btn btn-primary" type="submit">Search</button>
+        </form>
         {% if data %}
         <table class="table">
             <thead>
