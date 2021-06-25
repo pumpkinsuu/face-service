@@ -45,6 +45,7 @@ def create_admin_bp(app):
         return render_template('loginPage.html')
 
     @admin_bp.route('/logout')
+    @login_required
     def logout():
         logout_user()
         return redirect(url_for('admin_bp.login'))
