@@ -18,10 +18,15 @@ def error_api(e: ErrorAPI):
     return e.detail()
 
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return response(404, str(e))
+
+
 @app.errorhandler(Exception)
 def exception(e):
-    log.info(str(e), exc_info=True)
-    return response(500, str(e))
+    log.exception(e)
+    return response(500, 'internal server error')
 
 
 @app.before_request

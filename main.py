@@ -19,6 +19,11 @@ def error_api(e: ErrorAPI):
     return e.detail()
 
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return response(404, str(e))
+
+
 @app.errorhandler(Exception)
 def exception(e):
     log.exception(e)
