@@ -8,7 +8,7 @@ OUTPUT = 128
 if METRIC == 'cosine':
     TOL = 0.06
 else:
-    TOL = 0.37
+    TOL = 0.25
 FACE_LOCATION = [(0, 150, 150, 0)]
 
 
