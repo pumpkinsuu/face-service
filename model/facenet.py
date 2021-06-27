@@ -7,9 +7,9 @@ NAME = 'facenet'
 INPUT = (160, 160)
 OUTPUT = 512
 if METRIC == 'cosine':
-    TOL = 0.3
+    TOL = 0.25
 else:
-    TOL = 0.67
+    TOL = 0.68
 MODEL_PATH = 'model/data/facenet.pb'
 
 
