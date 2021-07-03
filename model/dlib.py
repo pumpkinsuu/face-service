@@ -6,9 +6,9 @@ NAME = 'dlib'
 INPUT = (150, 150)
 OUTPUT = 128
 if METRIC == 'cosine':
-    TOL = 0.03
+    TOL = 0.05
 else:
-    TOL = 0.25
+    TOL = 0.30
 FACE_LOCATION = [(0, 150, 150, 0)]
 
 
