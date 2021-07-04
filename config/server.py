@@ -1,6 +1,6 @@
 # Model
 MODELS = ['dlib', 'facenet']
-MODEL = 'dlib'
+MODEL = 'facenet'
 """
     euclidean
     cosine
@@ -24,7 +24,7 @@ REDIS_UPDATE_DB = 1
 REQUEST_SLEEP = 0.1
 # Model
 EMBED_INPUT = 'images'
-EMBED_SIZE = 3
+EMBED_SIZE = 1
 EMBED_SLEEP = 0.1
 # Register
 UPDATE_INPUT = 'users'
