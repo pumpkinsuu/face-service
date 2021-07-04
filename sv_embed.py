@@ -47,6 +47,7 @@ def embed_service():
 
         except Exception as ex:
             log.exception(ex)
+            db.flushall()
 
 
 if __name__ == "__main__":

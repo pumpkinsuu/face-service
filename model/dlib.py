@@ -1,5 +1,5 @@
 import face_recognition as fr
-from utilities.face import b64ToArray, l2_normalize
+from utilities.face import b64ToArray, l2_normalize, np
 from config.server import METRIC
 
 NAME = 'dlib'
@@ -27,7 +27,7 @@ class Model:
 
     def embedding(self, data: list):
         embeds = [
-            self.model.face_encodings(img, self.face_location)[0].tolist()
+            self.model.face_encodings(np.array(img, dtype='uint8'), self.face_location)[0].tolist()
             for img in data
         ]
         return l2_normalize(embeds).tolist()

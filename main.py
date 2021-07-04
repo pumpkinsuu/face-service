@@ -26,7 +26,7 @@ def page_not_found(e):
 
 @app.errorhandler(Exception)
 def exception(e):
-    log.info(e)
+    log.info(e, exc_info=True)
     return response(500, 'internal server error')
 
 
