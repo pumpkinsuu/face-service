@@ -11,7 +11,7 @@ METRIC = 'euclidean'
     mean_later
     min_later
 """
-METHOD = 'mean_first'
+METHOD = 'mean_later'
 # Server
 HOST = '0.0.0.0'
 PORT = 5001
