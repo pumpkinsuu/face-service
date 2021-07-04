@@ -34,9 +34,9 @@ def exception(e):
 def check_request():
     g.start = time()
 
-    if 'api_key' not in request.headers:
+    if 'Authorization' not in request.headers:
         raise ErrorAPI(400, 'no api_key provided')
-    api_key = request.headers['api_key']
+    api_key = request.headers['Authorization']
 
     data = admin_db.get_data({'key': api_key})
     if not data:
