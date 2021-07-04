@@ -17,4 +17,4 @@ def b64ToArray(b64str, size):
     img = Image.open(BytesIO(b64decode(b64str)))\
         .convert('RGB')\
         .resize(size, Image.ANTIALIAS)
-    return np.array(img)
+    return np.array(img, dtype='uint8')
