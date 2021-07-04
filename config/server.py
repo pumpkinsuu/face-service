@@ -1,6 +1,6 @@
 # Model
 MODELS = ['dlib', 'facenet']
-MODEL = 'facenet'
+MODEL = 'dlib'
 """
     euclidean
     cosine
