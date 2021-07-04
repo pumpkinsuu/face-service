@@ -33,7 +33,7 @@ def embed_service():
             for q in queue:
                 data = json.loads(q)
                 ids.append(data['id'])
-                inputs.append(np.array(data['image'], dtype='uint8'))
+                inputs.append(np.array(data['image']))
 
             if ids:
                 embeds = model.embedding(inputs)

@@ -9,7 +9,7 @@ OUTPUT = 512
 if METRIC == 'cosine':
     TOL = 0.26
 else:
-    TOL = 0.69
+    TOL = 0.68
 MODEL_PATH = 'model/data/facenet.pb'
 
 
