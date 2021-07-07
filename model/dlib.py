@@ -12,18 +12,22 @@ else:
 FACE_LOCATION = [(0, 150, 150, 0)]
 
 
-def preprocess(b64str: str):
-    return b64ToArray(b64str, INPUT).tolist()
-
-
 class Model:
+    model: any
+
     def __init__(self):
-        self.model = fr
         self.name = NAME
         self.input = INPUT
         self.output = OUTPUT
         self.tol = TOL
         self.face_location = FACE_LOCATION
+
+    def load(self):
+        self.model = fr
+
+    @staticmethod
+    def preprocess(b64str: str):
+        return b64ToArray(b64str, INPUT).tolist()
 
     def embedding(self, data: list):
         embeds = [

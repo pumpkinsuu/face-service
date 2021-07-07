@@ -30,21 +30,29 @@ def load_pb(path):
         return graph
 
 
-def preprocess(b64str: str):
-    return prewhiten(b64ToArray(b64str, INPUT)).tolist()
-
-
 class Model:
+    graph: any
+    sess: any
+    tf_input: any
+    tf_output: any
+    tf_placeholder: any
+
     def __init__(self):
         self.name = NAME
         self.input = INPUT
         self.output = OUTPUT
         self.tol = TOL
+
+    def load(self):
         self.graph = load_pb(MODEL_PATH)
         self.sess = tf.compat.v1.Session(graph=self.graph)
         self.tf_input = self.graph.get_tensor_by_name('input:0')
         self.tf_output = self.graph.get_tensor_by_name('embeddings:0')
         self.tf_placeholder = self.graph.get_tensor_by_name('phase_train:0')
+
+    @staticmethod
+    def preprocess(b64str: str):
+        return prewhiten(b64ToArray(b64str, INPUT)).tolist()
 
     def embedding(self, data: list):
         feed_dict = {self.tf_input: data, self.tf_placeholder: False}

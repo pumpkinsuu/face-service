@@ -9,12 +9,11 @@ from utilities.api import logger
 
 
 def embed_service():
-    if MODEL == 'facenet':
-        from model.facenet import Model
-        model = Model()
-    else:
-        from model.dlib import Model
-        model = Model()
+    import importlib
+    module = importlib.import_module(f'model.{MODEL}')
+    Model = getattr(module, 'Model')
+    model = Model()
+    model.load()
 
     db = StrictRedis(
         host=REDIS_HOST,

@@ -11,12 +11,12 @@ from utilities.face_method import get_method
 
 
 def update_service():
-    if MODEL == 'facenet':
-        from model.facenet import NAME, OUTPUT, TOL
-    else:
-        from model.dlib import NAME, OUTPUT, TOL
+    import importlib
+    module = importlib.import_module(f'model.{MODEL}')
+    Model = getattr(module, 'Model')
+    model = Model()
 
-    face_db = FaceData(NAME, OUTPUT)
+    face_db = FaceData(model.name, model.output)
     db = StrictRedis(
         host=REDIS_HOST,
         port=REDIS_PORT,
@@ -39,7 +39,7 @@ def update_service():
 
                 if db_ids:
                     dist, ids = find_min(embeds, db_embeds, METRIC)
-                    exist = np.any(np.array(db_ids)[ids[dist < TOL]] != user['id'])
+                    exist = np.any(np.array(db_ids)[ids[dist < model.tol]] != user['id'])
                 else:
                     exist = False
 

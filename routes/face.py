@@ -17,15 +17,15 @@ from utilities.face_method import get_method
 def create_face_bp(app):
     face_bp = Blueprint('face_bp', __name__)
 
-    if MODEL == 'dlib':
-        from model.dlib import preprocess, NAME, OUTPUT, TOL
-    else:
-        from model.facenet import preprocess, NAME, OUTPUT, TOL
+    import importlib
+    module = importlib.import_module(f'model.{MODEL}')
+    Model = getattr(module, 'Model')
+    model = Model()
 
     log = logger()
     find_min = get_method()
 
-    face_db = FaceData(NAME, OUTPUT, app)
+    face_db = FaceData(model.name, model.output, app)
 
     embed_db = StrictRedis(
         host=REDIS_HOST,
@@ -46,7 +46,7 @@ def create_face_bp(app):
             data[i] = []
 
             try:
-                img = preprocess(img)
+                img = model.preprocess(img)
             except UnidentifiedImageError:
                 raise ErrorAPI(400, 'unidentified image')
 
@@ -147,7 +147,7 @@ def create_face_bp(app):
             np.array([left, right]),
             METRIC
         ).max()
-        if dist > TOL:
+        if dist > model.tol:
             raise ErrorAPI(400, 'different person')
 
         user = {
@@ -220,7 +220,7 @@ def create_face_bp(app):
 
         dist, ids = find_min(embeds, db_embeds, METRIC)
         users = np.array(db_ids)[ids]
-        users[dist >= TOL] = ''
+        users[dist >= model.tol] = ''
 
         data = {
             'users': users.tolist(),
@@ -251,7 +251,7 @@ def create_face_bp(app):
 
         embeds = get_embed(images)
         dist, _ = find_min(embeds, np.array([user['embeds']]), METRIC)
-        result = np.all(dist < TOL)
+        result = np.all(dist < model.tol)
 
         return response(200, {'result': bool(result)})
 
